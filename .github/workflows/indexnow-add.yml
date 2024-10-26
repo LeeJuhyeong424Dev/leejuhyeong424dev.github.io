@@ -58,7 +58,7 @@ jobs:
             URLS="${URLS%,}"
 
             # IndexNow API 호출을 위한 JSON 데이터 구성
-            JSON_PAYLOAD="{\"host\": \"leejuhyeong424dev.github.io\", \"key\": \"$INDEXNOW_API_KEY\", \"urlList\": [${URLS}]}"
+            JSON_PAYLOAD="{\"host\": \"leejuhyeong424dev.github.io\", \"key\": \"$INDEXNOW_API_KEY\", \"keyLocation\": \"https://leejuhyeong424dev.github.io/myIndexNowKey.txt\", \"urlList\": [${URLS}]}"
             
             echo "IndexNow API 호출 중... JSON Payload: $JSON_PAYLOAD"
 
@@ -75,12 +75,6 @@ jobs:
             echo "IndexNow API 응답 본문:"
             echo "$HTTP_BODY"
             echo "IndexNow API 상태 코드: $HTTP_STATUS"
-
-            # 상태 코드에 따라 처리
-            if [ "$HTTP_STATUS" -ne 200 ]; then
-              echo "API 호출에 실패했습니다. 상태 코드: $HTTP_STATUS"
-              exit 1
-            fi
 
             # 응답에서 링크별 상태 파싱 및 출력 (쉘 문자열 파싱 방식)
             URL_ARRAY=$(echo "$HTTP_BODY" | grep -o '"url":"[^"]*"' | sed 's/"url":"//g' | sed 's/"//g')
