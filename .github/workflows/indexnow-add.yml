@@ -10,11 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v3
+
       - name: 30초 대기
         run: |
           echo "IndexNow 워크플로우 시작 후 30초 대기합니다..."
           sleep 30
-          
+
       - name: 추가된 파일 출력
         run: |
           echo "IndexNow 추가 워크플로우가 실행되었습니다."
@@ -44,6 +47,15 @@ jobs:
           # 파일 목록을 쉼표를 기준으로 나누어 하나씩 처리하여 URL 구성
           IFS=',' read -ra FILES <<< "$ADDED_FILES"
           
+          # 파일의 절대 경로 지정
+          STATUS_FILE_PATH="./indexnow-status.md"
+          
+          # 파일이 존재하는지 확인
+          if [ ! -f "$STATUS_FILE_PATH" ]; then
+            echo "파일이 존재하지 않습니다: $STATUS_FILE_PATH"
+            exit 1
+          fi
+
           # 임시 파일 생성
           TEMP_FILE="updated_indexnow_status.md"
           touch $TEMP_FILE
@@ -129,7 +141,7 @@ jobs:
               if [[ "$SECTION" != "add" ]]; then
                   echo "$line" >> $TEMP_FILE
               fi
-          done < indexnow-status.md
+          done < "$STATUS_FILE_PATH"
 
           # 기존 파일을 업데이트된 파일로 교체
-          mv $TEMP_FILE indexnow-status.md
+          mv $TEMP_FILE $STATUS_FILE_PATH
