@@ -67,8 +67,7 @@ jobs:
               if [[ "$line" == "## 인덱스 추가" ]]; then
                   SECTION="add"
                   echo "$line" >> $TEMP_FILE
-                  echo "| 처리 날짜   | 응답 결과    | 처리한 링크                                                      |" >> $TEMP_FILE
-                  echo "|------------|-------------|-----------------------------------------------------------------|" >> $TEMP_FILE
+                  echo "" >> $TEMP_FILE  # 빈 줄 추가
 
                   # 새로운 내용을 기존 섹션에 추가 (최신순으로 추가)
                   for FILE in "${FILES[@]}"; do
@@ -126,6 +125,7 @@ jobs:
                       # 새로운 기록을 추가 (툴팁과 함께 표 형식으로)
                       echo "| $CURRENT_DATE | <span title=\"$STATUS_DETAIL\">$STATUS_TEXT</span> | [$URL]($URL) |" >> $TEMP_FILE
                   done
+                  echo "" >> $TEMP_FILE  # 섹션 끝에 빈 줄 추가
                   continue
               elif [[ "$line" == "## 인덱스 수정" ]]; then
                   SECTION="modify"
