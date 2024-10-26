@@ -10,6 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: 30초 대기
+        run: |
+          echo "IndexNow 워크플로우 시작 후 30초 대기합니다..."
+          sleep 30
+          
       - name: 추가된 파일 출력
         run: |
           echo "IndexNow 추가 워크플로우가 실행되었습니다."
