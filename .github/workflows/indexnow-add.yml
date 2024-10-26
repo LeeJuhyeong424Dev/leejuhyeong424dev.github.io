@@ -41,7 +41,7 @@ jobs:
             echo "추출된 제목: $TITLE"
 
             # URL 구성 (추출된 제목을 기반으로 페이지 URL 생성)
-            URL="https://yourdomain.com/posts/${TITLE}"
+            URL="https://leejuhyeong424dev.github.io/posts/${TITLE}"
             URLS="${URLS}\"${URL}\","
           done
 
@@ -51,7 +51,7 @@ jobs:
             URLS="${URLS%,}"
 
             # IndexNow API 호출을 위한 JSON 데이터 구성
-            JSON_PAYLOAD="{\"host\": \"yourdomain.com\", \"key\": \"7e480e69b9bf46cda091ab8da6e4ea97\", \"urlList\": [${URLS}]}"
+            JSON_PAYLOAD="{\"host\": \"leejuhyeong424dev.github.io\", \"key\": \"7e480e69b9bf46cda091ab8da6e4ea97\", \"urlList\": [${URLS}]}"
             
             echo "IndexNow API 호출 중... JSON Payload: $JSON_PAYLOAD"
 
