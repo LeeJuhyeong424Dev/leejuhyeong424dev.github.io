@@ -10,6 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: 30초 대기
+        run: |
+          echo "IndexNow 워크플로우 시작 후 30초 대기합니다..."
+          sleep 30
+          
       - name: 추가된 파일 출력
         run: |
           echo "IndexNow 추가 워크플로우가 실행되었습니다."
@@ -28,6 +33,8 @@ jobs:
           done
 
       - name: 파일명에서 제목 추출 및 여러 URL IndexNow API 호출 후 응답 파싱
+        env:
+          INDEXNOW_API_KEY: ${{ secrets.INDEXNOW_API_KEY }}
         run: |
           ADDED_FILES="${{ join(github.event.client_payload.added_files, ',') }}"
           echo "전달된 추가된 파일 목록: $ADDED_FILES"
@@ -41,7 +48,7 @@ jobs:
             echo "추출된 제목: $TITLE"
 
             # URL 구성 (추출된 제목을 기반으로 페이지 URL 생성)
-            URL="https://yourdomain.com/posts/${TITLE}"
+            URL="https://leejuhyeong424dev.github.io/posts/${TITLE}"
             URLS="${URLS}\"${URL}\","
           done
 
@@ -51,22 +58,33 @@ jobs:
             URLS="${URLS%,}"
 
             # IndexNow API 호출을 위한 JSON 데이터 구성
-            JSON_PAYLOAD="{\"host\": \"yourdomain.com\", \"key\": \"7e480e69b9bf46cda091ab8da6e4ea97\", \"urlList\": [${URLS}]}"
+            JSON_PAYLOAD="{\"host\": \"leejuhyeong424dev.github.io\", \"key\": \"$INDEXNOW_API_KEY\", \"urlList\": [${URLS}]}"
             
             echo "IndexNow API 호출 중... JSON Payload: $JSON_PAYLOAD"
 
             # IndexNow API 호출 및 응답 저장
             RESPONSE=$(curl -s -X POST "https://api.indexnow.org/indexnow" \
               -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD")
+              -d "$JSON_PAYLOAD" -w "\n%{http_code}")
 
-            # 응답 출력 및 각 URL의 상태 파싱
+            # 응답 본문과 상태 코드 분리
+            HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+            HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+
+            # 응답 출력 및 상태 코드 확인
             echo "IndexNow API 응답 본문:"
-            echo "$RESPONSE"
+            echo "$HTTP_BODY"
+            echo "IndexNow API 상태 코드: $HTTP_STATUS"
+
+            # 상태 코드에 따라 처리
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "API 호출에 실패했습니다. 상태 코드: $HTTP_STATUS"
+              exit 1
+            fi
 
             # 응답에서 링크별 상태 파싱 및 출력 (쉘 문자열 파싱 방식)
-            URL_ARRAY=$(echo "$RESPONSE" | grep -o '"url":"[^"]*"' | sed 's/"url":"//g' | sed 's/"//g')
-            STATUS_ARRAY=$(echo "$RESPONSE" | grep -o '"statusCode":[0-9]*' | sed 's/"statusCode"://g')
+            URL_ARRAY=$(echo "$HTTP_BODY" | grep -o '"url":"[^"]*"' | sed 's/"url":"//g' | sed 's/"//g')
+            STATUS_ARRAY=$(echo "$HTTP_BODY" | grep -o '"statusCode":[0-9]*' | sed 's/"statusCode"://g')
 
             # URL과 상태 코드를 순서대로 매칭하여 출력
             IFS=$'\n' read -rd '' -a URLS <<<"$URL_ARRAY"
