@@ -131,10 +131,8 @@ jobs:
                       echo "| $CURRENT_DATE | <span title=\"$STATUS_DETAIL\">$STATUS_TEXT</span> | [$URL]($URL) |" >> $TEMP_FILE
                   done
 
-                  # 기존 내용을 복사하여 TEMP_FILE에 붙여넣기
-                  while IFS= read -r old_line; do
-                    echo "$old_line" >> $TEMP_FILE
-                  done < <(tail -n +4 "$STATUS_FILE_PATH" | grep -v "^---$")
+                  # 기존 표의 내용 추가 (기존 내용을 새로운 내용 아래로 복사)
+                  tail -n +4 "$STATUS_FILE_PATH" >> $TEMP_FILE
                   continue
               elif [[ "$line" == "## 인덱스 수정" ]]; then
                   SECTION="modify"
