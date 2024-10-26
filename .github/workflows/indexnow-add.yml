@@ -129,6 +129,7 @@ jobs:
                       echo "| $CURRENT_DATE | <span title=\"$STATUS_DETAIL\">$STATUS_TEXT</span> | [$URL]($URL) |" >> $TEMP_FILE
                   done
                   echo "" >> $TEMP_FILE  # 새로운 기록 후 한 줄 띄우기
+                  echo "---" >> $TEMP_FILE  # 마지막에 구분선 추가
                   continue
               elif [[ "$line" == "## 인덱스 수정" ]]; then
                   SECTION="modify"
