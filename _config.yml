@@ -23,7 +23,7 @@ description: >- # SEO 메타 및 Atom 피드에서 사용됩니다.
 
 # 사이트의 프로토콜 및 호스트명을 입력하세요.
 # 예: 'https://username.github.io', 슬래시로 끝나지 않는다는 점에 주의하세요.
-url: "https://leejuhyeong424.github.io"
+url: "https://leejuhyeong424dev.github.io"
 
 github:
   username: leejuhyeong424 # GitHub 사용자 이름으로 변경
