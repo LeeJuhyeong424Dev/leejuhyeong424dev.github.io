@@ -1,0 +1,80 @@
+name: IndexNow 추가
+
+on:
+  repository_dispatch:
+    types:
+      - indexnow-add  # "indexnow-add" 이벤트 타입 감지
+
+jobs:
+  indexnow_add_job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 추가된 파일 출력
+        run: |
+          echo "IndexNow 추가 워크플로우가 실행되었습니다."
+
+          # 전달된 client_payload 전체를 출력해봅니다.
+          echo "전달된 client_payload 데이터: ${{ toJson(github.event.client_payload) }}"
+
+          # 전달된 추가된 파일 목록을 쉼표로 분리된 배열로 가져옵니다.
+          ADDED_FILES="${{ join(github.event.client_payload.added_files, ',') }}"
+          echo "전달된 추가된 파일 목록: $ADDED_FILES"
+
+          # 파일 목록을 쉼표를 기준으로 나누어 하나씩 출력
+          IFS=',' read -ra FILES <<< "$ADDED_FILES"
+          for FILE in "${FILES[@]}"; do
+            echo "추가된 파일: $FILE"
+          done
+
+      - name: 파일명에서 제목 추출 및 여러 URL IndexNow API 호출 후 응답 파싱
+        run: |
+          ADDED_FILES="${{ join(github.event.client_payload.added_files, ',') }}"
+          echo "전달된 추가된 파일 목록: $ADDED_FILES"
+
+          # 파일 목록을 쉼표를 기준으로 나누어 하나씩 처리하여 URL 구성
+          IFS=',' read -ra FILES <<< "$ADDED_FILES"
+          URLS=""
+          for FILE in "${FILES[@]}"; do
+            # 파일명에서 날짜와 확장자를 제외한 제목 부분만 추출
+            TITLE=$(echo "$FILE" | sed -E 's|_posts/[0-9]{4}-[0-9]{2}-[0-9]{2}-(.*)\.md|\1|')
+            echo "추출된 제목: $TITLE"
+
+            # URL 구성 (추출된 제목을 기반으로 페이지 URL 생성)
+            URL="https://yourdomain.com/posts/${TITLE}"
+            URLS="${URLS}\"${URL}\","
+          done
+
+          # URL 리스트가 비어있지 않다면 IndexNow API 호출
+          if [ -n "$URLS" ]; then
+            # 마지막 쉼표 제거
+            URLS="${URLS%,}"
+
+            # IndexNow API 호출을 위한 JSON 데이터 구성
+            JSON_PAYLOAD="{\"host\": \"yourdomain.com\", \"key\": \"7e480e69b9bf46cda091ab8da6e4ea97\", \"urlList\": [${URLS}]}"
+            
+            echo "IndexNow API 호출 중... JSON Payload: $JSON_PAYLOAD"
+
+            # IndexNow API 호출 및 응답 저장
+            RESPONSE=$(curl -s -X POST "https://api.indexnow.org/indexnow" \
+              -H "Content-Type: application/json" \
+              -d "$JSON_PAYLOAD")
+
+            # 응답 출력 및 각 URL의 상태 파싱
+            echo "IndexNow API 응답 본문:"
+            echo "$RESPONSE"
+
+            # 응답에서 링크별 상태 파싱 및 출력 (쉘 문자열 파싱 방식)
+            URL_ARRAY=$(echo "$RESPONSE" | grep -o '"url":"[^"]*"' | sed 's/"url":"//g' | sed 's/"//g')
+            STATUS_ARRAY=$(echo "$RESPONSE" | grep -o '"statusCode":[0-9]*' | sed 's/"statusCode"://g')
+
+            # URL과 상태 코드를 순서대로 매칭하여 출력
+            IFS=$'\n' read -rd '' -a URLS <<<"$URL_ARRAY"
+            IFS=$'\n' read -rd '' -a STATUS_CODES <<<"$STATUS_ARRAY"
+
+            for i in "${!URLS[@]}"; do
+              echo "URL: ${URLS[$i]}, 상태 코드: ${STATUS_CODES[$i]}"
+            done
+          else
+            echo "추가된 파일이 없어 IndexNow API 호출을 생략합니다."
+          fi

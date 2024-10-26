@@ -1,0 +1,28 @@
+name: IndexNow 삭제
+
+on:
+  repository_dispatch:
+    types:
+      - indexnow-delete  # "indexnow-delete" 이벤트 타입 감지
+
+jobs:
+  indexnow_delete_job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 삭제된 파일 출력
+        run: |
+          echo "IndexNow 삭제 워크플로우가 실행되었습니다."
+
+          # 전달된 client_payload 전체를 출력해봅니다.
+          echo "전달된 client_payload 데이터: ${{ toJson(github.event.client_payload) }}"
+
+          # 전달된 삭제된 파일 목록을 쉼표로 분리된 배열로 가져옵니다.
+          DELETED_FILES="${{ join(github.event.client_payload.deleted_files, ',') }}"
+          echo "전달된 삭제된 파일 목록: $DELETED_FILES"
+
+          # 파일 목록을 쉼표를 기준으로 나누어 하나씩 출력
+          IFS=',' read -ra FILES <<< "$DELETED_FILES"
+          for FILE in "${FILES[@]}"; do
+            echo "삭제된 파일: $FILE"
+          done
