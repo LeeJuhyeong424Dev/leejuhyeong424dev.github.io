@@ -3,7 +3,7 @@ name: IndexNow 추가
 on:
   repository_dispatch:
     types:
-      - indexnow-add  # "indexnow-add" 이벤트 타입 감지
+      - indexnow-add
 
 jobs:
   indexnow_add_job:
@@ -40,16 +40,16 @@ jobs:
           INDEXNOW_API_KEY: ${{ secrets.INDEXNOW_API_KEY }}
         run: |
           set +e  # 오류 발생 시 스크립트가 중단되지 않도록 설정
-          
+
           ADDED_FILES="${{ join(github.event.client_payload.added_files, ',') }}"
           echo "전달된 추가된 파일 목록: $ADDED_FILES"
 
           # 파일 목록을 쉼표를 기준으로 나누어 하나씩 처리하여 URL 구성
           IFS=',' read -ra FILES <<< "$ADDED_FILES"
-          
+
           # 파일의 절대 경로 지정
           STATUS_FILE_PATH="./indexnow-status.md"
-          
+
           # 파일이 존재하는지 확인
           if [ ! -f "$STATUS_FILE_PATH" ]; then
             echo "파일이 존재하지 않습니다: $STATUS_FILE_PATH"
@@ -80,10 +80,10 @@ jobs:
 
                       # URL 구성 (추출된 제목을 기반으로 페이지 URL 생성)
                       URL="https://leejuhyeong424dev.github.io/posts/${TITLE}"
-                      
+
                       # IndexNow API 호출을 위한 JSON 데이터 구성
                       JSON_PAYLOAD="{\"host\": \"leejuhyeong424dev.github.io\", \"key\": \"$INDEXNOW_API_KEY\", \"keyLocation\": \"https://leejuhyeong424dev.github.io/myIndexNowKey.txt\", \"urlList\": [\"${URL}\"]}"
-                      
+
                       echo "IndexNow API 호출 중... JSON Payload: $JSON_PAYLOAD"
 
                       # IndexNow API 호출 및 응답 저장
@@ -130,6 +130,7 @@ jobs:
                   done
                   echo "" >> $TEMP_FILE  # 새로운 기록 후 한 줄 띄우기
                   echo "---" >> $TEMP_FILE  # 마지막에 구분선 추가
+
                   continue
               elif [[ "$line" == "## 인덱스 수정" ]]; then
                   SECTION="modify"
