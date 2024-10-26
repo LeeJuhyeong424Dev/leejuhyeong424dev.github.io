@@ -62,6 +62,8 @@ jobs:
 
           # 기존 indexnow-status.md 파일을 읽어 각 섹션별로 처리
           SECTION="none"
+          NEW_CONTENT=""
+
           while IFS= read -r line
           do
               if [[ "$line" == "## 인덱스 추가" ]]; then
@@ -128,9 +130,10 @@ jobs:
                       # 새로운 기록을 추가 (툴팁과 함께 표 형식으로)
                       echo "| $CURRENT_DATE | <span title=\"$STATUS_DETAIL\">$STATUS_TEXT</span> | [$URL]($URL) |" >> $TEMP_FILE
                   done
+
+                  # 기존 내용 추가 (섹션의 기존 기록을 유지)
                   echo "" >> $TEMP_FILE  # 새로운 기록 후 한 줄 띄우기
                   echo "---" >> $TEMP_FILE  # 마지막에 구분선 추가
-
                   continue
               elif [[ "$line" == "## 인덱스 수정" ]]; then
                   SECTION="modify"
