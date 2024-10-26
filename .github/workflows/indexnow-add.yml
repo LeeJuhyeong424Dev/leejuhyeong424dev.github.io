@@ -36,6 +36,8 @@ jobs:
         env:
           INDEXNOW_API_KEY: ${{ secrets.INDEXNOW_API_KEY }}
         run: |
+          set +e  # 오류 발생 시 스크립트가 중단되지 않도록 설정
+          
           ADDED_FILES="${{ join(github.event.client_payload.added_files, ',') }}"
           echo "전달된 추가된 파일 목록: $ADDED_FILES"
 
@@ -57,7 +59,7 @@ jobs:
             # 마지막 쉼표 제거
             URLS="${URLS%,}"
 
-            # IndexNow API 호출을 위한 JSON 데이터 구성
+            # IndexNow API 호출을 위한 JSON 데이터 구성 (keyLocation 추가)
             JSON_PAYLOAD="{\"host\": \"leejuhyeong424dev.github.io\", \"key\": \"$INDEXNOW_API_KEY\", \"keyLocation\": \"https://leejuhyeong424dev.github.io/myIndexNowKey.txt\", \"urlList\": [${URLS}]}"
             
             echo "IndexNow API 호출 중... JSON Payload: $JSON_PAYLOAD"
@@ -65,7 +67,7 @@ jobs:
             # IndexNow API 호출 및 응답 저장
             RESPONSE=$(curl -s -X POST "https://api.indexnow.org/indexnow" \
               -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD" -w "\n%{http_code}")
+              -d "$JSON_PAYLOAD" -w "\n%{http_code}" || true)
 
             # 응답 본문과 상태 코드 분리
             HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
@@ -75,6 +77,7 @@ jobs:
             echo "IndexNow API 응답 본문:"
             echo "$HTTP_BODY"
             echo "IndexNow API 상태 코드: $HTTP_STATUS"
+
 
             # 응답에서 링크별 상태 파싱 및 출력 (쉘 문자열 파싱 방식)
             URL_ARRAY=$(echo "$HTTP_BODY" | grep -o '"url":"[^"]*"' | sed 's/"url":"//g' | sed 's/"//g')
