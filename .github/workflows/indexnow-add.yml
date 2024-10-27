@@ -70,20 +70,20 @@ jobs:
               CURRENT_DATE=$(date +%Y-%m-%dT%H:%M:%S)
 
               case "$HTTP_STATUS" in
-                200) STATUS_TEXT="성공" ;;
-                202) STATUS_TEXT="검증 중" ;;
-                400) STATUS_TEXT="잘못된 요청" ;;
-                403) STATUS_TEXT="키 오류" ;;
-                422) STATUS_TEXT="호스트 불일치" ;;
-                429) STATUS_TEXT="요청 초과" ;;
-                *) STATUS_TEXT="알 수 없는 오류" ;;
+                200) STATUS_TEXT="성공"; STATUS_DETAIL="URL 제출 성공 (반환 코드: $HTTP_STATUS)" ;;
+                202) STATUS_TEXT="검증 중"; STATUS_DETAIL="URL 수신됨. IndexNow 키 검증 보류 중 (반환 코드: $HTTP_STATUS)" ;;
+                400) STATUS_TEXT="잘못된 요청"; STATUS_DETAIL="잘못된 요청 형식 (반환 코드: $HTTP_STATUS)" ;;
+                403) STATUS_TEXT="키 오류"; STATUS_DETAIL="유효하지 않은 키 (반환 코드: $HTTP_STATUS)" ;;
+                422) STATUS_TEXT="호스트 불일치"; STATUS_DETAIL="호스트 불일치 또는 키 불일치 (반환 코드: $HTTP_STATUS)" ;;
+                429) STATUS_TEXT="요청 초과"; STATUS_DETAIL="너무 많은 요청 (반환 코드: $HTTP_STATUS)" ;;
+                *) STATUS_TEXT="알 수 없는 오류"; STATUS_DETAIL="알 수 없는 오류 (반환 코드: $HTTP_STATUS)" ;;
               esac
 
-              echo "| $CURRENT_DATE | 추가 | $STATUS_TEXT | [$URL]($URL) |" >> $TEMP_FILE
+              echo "| $CURRENT_DATE | 추가 | <span title="$STATUS_DETAIL">$STATUS_TEXT</span> | [$URL]($URL) |" >> $TEMP_FILE
           done
 
           # 기존 파일의 나머지 내용 추가 (기존 기록을 새로운 기록 아래에 추가)
-          tail -n +8 "$STATUS_FILE_PATH" >> $TEMP_FILE
+          tail -n +9 "$STATUS_FILE_PATH" >> $TEMP_FILE
 
           mv $TEMP_FILE $STATUS_FILE_PATH
 
