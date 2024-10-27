@@ -79,7 +79,7 @@ jobs:
                 *) STATUS_TEXT="알 수 없는 오류"; STATUS_DETAIL="알 수 없는 오류 (반환 코드: $HTTP_STATUS)" ;;
               esac
 
-              echo "| $CURRENT_DATE | 추가 | <span title="$STATUS_DETAIL">$STATUS_TEXT</span> | [$URL]($URL) |" >> $TEMP_FILE
+              echo "| $CURRENT_DATE | 추가 | <span title=\"$STATUS_DETAIL\">$STATUS_TEXT</span> | [$URL]($URL) |" >> $TEMP_FILE
           done
 
           # 기존 파일의 나머지 내용 추가 (기존 기록을 새로운 기록 아래에 추가)
