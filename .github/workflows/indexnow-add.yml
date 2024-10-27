@@ -67,7 +67,7 @@ jobs:
                 -d "$JSON_PAYLOAD" -w "\n%{http_code}" || true)
 
               HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
-              CURRENT_DATE=$(date +%Y-%m-%dT%H:%M:%S)
+              CURRENT_DATE=$(date -u +"%Y년 %m월 %d일 %H시 %M분 %S초" -d '9 hour')
 
               case "$HTTP_STATUS" in
                 200) STATUS_TEXT="성공"; STATUS_DETAIL="URL 제출 성공 (반환 코드: $HTTP_STATUS)" ;;

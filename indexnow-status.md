@@ -11,5 +11,3 @@ permalink: /indexnow-status/
 | 2024-10-27T04:42:42 | 추가 | 성공 | [https://leejuhyeong424dev.github.io/posts/ddd](https://leejuhyeong424dev.github.io/posts/ddd) |
 | 2024-10-27T04:42:43 | 추가 | 성공 | [https://leejuhyeong424dev.github.io/posts/dddd](https://leejuhyeong424dev.github.io/posts/dddd) |
 | 2024-10-27T04:42:43 | 추가 | 성공 | [https://leejuhyeong424dev.github.io/posts/ddddd](https://leejuhyeong424dev.github.io/posts/ddddd) |
-|------------|------------|-------------|------------------------------------------------------------------|
-|            |            |             |                                                                  |
